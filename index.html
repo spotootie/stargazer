@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#402653" />
+  <meta name="description" content="Stargazer Psychiatry Interview Trainer — a pixel-art rehearsal companion for residency interviews." />
+  <title>Stargazer • Psychiatry Interview Trainer</title>
+  <link rel="icon" type="image/svg+xml" href="assets/stargazer-icon.svg" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="crt"></div>
+  <main class="console-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="assets/stargazer-icon.svg" alt="Pixel-art Stargazer flower" class="brand-icon" />
+        <div>
+          <div class="brand-kicker">STARGAZER</div>
+          <h1>Psychiatry Interview Trainer</h1>
+        </div>
+      </div>
+      <div class="status-chip"><span class="status-dot"></span> TRAINING MODE</div>
+    </header>
+
+    <section class="hero screen-panel">
+      <div class="hero-art" aria-hidden="true">
+        <div class="sun"></div>
+        <div class="pixel-flower flower-a"></div>
+        <div class="pixel-flower flower-b"></div>
+        <div class="pixel-flower flower-c"></div>
+        <div class="grass"></div>
+      </div>
+      <div class="hero-copy">
+        <div class="eyebrow">▶ SAVE POINT 01</div>
+        <h2>Your story is the adventure.</h2>
+        <p>Practice your answers, pressure-test your story, and build the confidence to walk into your Psychiatry interview ready.</p>
+        <div class="hero-actions">
+          <button class="pixel-btn primary" data-route="practice">START PRACTICE</button>
+          <button class="pixel-btn" data-route="quick">5-MIN QUICK REVIEW</button>
+        </div>
+      </div>
+    </section>
+
+    <nav class="menu-grid" aria-label="Training modes">
+      <button class="menu-card pink" data-route="story"><span class="menu-icon">✿</span><span>MY STORY</span><small>Your interview narrative</small></button>
+      <button class="menu-card purple" data-route="practice"><span class="menu-icon">★</span><span>PRACTICE</span><small>Question bank + answers</small></button>
+      <button class="menu-card blue" data-route="mock"><span class="menu-icon">◆</span><span>MOCK INTERVIEW</span><small>10 / 15 / 30 questions</small></button>
+      <button class="menu-card green" data-route="flashcards"><span class="menu-icon">▣</span><span>FLASHCARDS</span><small>Recall without scripts</small></button>
+      <button class="menu-card gold" data-route="rapid"><span class="menu-icon">⚡</span><span>RAPID REVIEW</span><small>Last-minute essentials</small></button>
+      <button class="menu-card coral" data-route="progress"><span class="menu-icon">↗</span><span>PROGRESS</span><small>Track your readiness</small></button>
+    </nav>
+
+    <section class="stats screen-panel">
+      <div><span class="stat-label">QUESTIONS READY</span><strong id="qCount">—</strong></div>
+      <div><span class="stat-label">INTERVIEW-READY</span><strong id="readyCount">0%</strong></div>
+      <div><span class="stat-label">STREAK</span><strong>0 DAYS</strong></div>
+      <div><span class="stat-label">SAVE DATA</span><strong>LOCAL</strong></div>
+    </section>
+
+    <section id="appView" class="screen-panel app-view" aria-live="polite">
+      <div class="view-placeholder">
+        <div class="pixel-heart">♥</div>
+        <h2>Choose a training mode</h2>
+        <p>Your personalized Psychiatry interview system is loaded below. Choose a module, then rehearse aloud before revealing your model answer.</p>
+      </div>
+    </section>
+
+    <footer>
+      <span>STARGAZER v0.1 • GBA-INSPIRED • LOCAL-FIRST</span>
+      <span>Built for rehearsal, not memorization.</span>
+    </footer>
+  </main>
+  <script src="js/app.js"></script>
+</body>
+</html>
