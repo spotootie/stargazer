@@ -45,3 +45,10 @@ Rehearsal data is stored in the browser's localStorage. The app does not send in
 3. Gameplay / simulation — complete
 4. Analytics, voice rehearsal, deeper scoring — next
 5. Final QA, accessibility, polish, GitHub deployment — final
+
+
+## iPhone / iPad Home Screen
+The repository now includes a real PNG `apple-touch-icon` rather than relying on the SVG favicon. When hosted over HTTPS (for example GitHub Pages), open the site in Safari and choose **Share → Add to Home Screen**. If an older icon is cached, remove the existing Home Screen bookmark first and add it again.
+
+## Before Interview Save Point
+The Before Interview module is a 2–3 minute final checkpoint covering the opening, Radiology explanation, six-year interval, Why Psychiatry, and closing statement. Checklist state is stored locally in the browser.

@@ -6,7 +6,15 @@
   <meta name="theme-color" content="#402653" />
   <meta name="description" content="Stargazer Psychiatry Interview Trainer — a pixel-art rehearsal companion for residency interviews." />
   <title>Stargazer • Psychiatry Interview Trainer</title>
-  <link rel="icon" type="image/svg+xml" href="assets/stargazer-icon.svg" />
+  <link rel="icon" href="assets/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Stargazer Psych" />
+  <meta name="format-detection" content="telephone=no" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
@@ -24,19 +32,17 @@
     </header>
 
     <section class="hero screen-panel">
-      <div class="hero-art" aria-hidden="true">
-        <div class="sun"></div>
-        <div class="pixel-flower flower-a"></div>
-        <div class="pixel-flower flower-b"></div>
-        <div class="pixel-flower flower-c"></div>
-        <div class="grass"></div>
+      <div class="hero-art world-scene" aria-hidden="true">
+        <img src="assets/stargazer-world.svg" alt="" class="world-scene-art" />
+        <div class="scene-hud"><span>STARGAZER VALLEY</span><span>✦ NIGHT ROUTE</span></div>
+        <div class="scene-caption">FOLLOW THE FLOWER PATH →</div>
       </div>
       <div class="hero-copy">
         <div class="eyebrow">▶ SAVE POINT 01</div>
         <h2>Your story is the adventure.</h2>
         <p>Practice your answers, pressure-test your story, and build the confidence to walk into your Psychiatry interview ready.</p>
         <div class="hero-actions">
-          <button class="pixel-btn primary" data-route="practice">START PRACTICE</button>
+          <button class="pixel-btn primary" data-route="before">BEFORE INTERVIEW</button>
           <button class="pixel-btn" data-route="quick">5-MIN QUICK REVIEW</button>
         </div>
       </div>
@@ -48,6 +54,7 @@
       <button class="menu-card blue" data-route="mock"><span class="menu-icon">◆</span><span>MOCK INTERVIEW</span><small>10 / 15 / 30 questions</small></button>
       <button class="menu-card green" data-route="flashcards"><span class="menu-icon">▣</span><span>FLASHCARDS</span><small>Recall without scripts</small></button>
       <button class="menu-card gold" data-route="rapid"><span class="menu-icon">⚡</span><span>RAPID REVIEW</span><small>Last-minute essentials</small></button>
+      <button class="menu-card pink before-card" data-route="before"><span class="menu-icon">🌸</span><span>BEFORE INTERVIEW</span><small>2–3 minute save point</small></button>
       <button class="menu-card coral" data-route="progress"><span class="menu-icon">↗</span><span>PROGRESS</span><small>Track your readiness</small></button>
     </nav>
 
@@ -71,6 +78,12 @@
       <span>Built for rehearsal, not memorization.</span>
     </footer>
   </main>
+  <div id="installHint" class="install-hint" role="status" aria-live="polite" hidden></div>
   <script src="js/app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+    }
+  </script>
 </body>
 </html>

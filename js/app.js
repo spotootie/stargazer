@@ -20,7 +20,7 @@ const PRESSURE_CHAINS = {
 };
 const BOSS_IDS = ['q03','q07','q08','q15','q22','q27','q32','q43','q51','q52'];
 
-function defaultState(){return {ratings:{},completed:{},favorites:{},lastCategory:'all',sessions:[],resume:null};}
+function defaultState(){return {ratings:{},completed:{},favorites:{},lastCategory:'all',sessions:[],resume:null,beforeChecklist:{}};}
 function loadState(){
   try { return {...defaultState(), ...(JSON.parse(localStorage.getItem(STORAGE)) || {})}; }
   catch { return defaultState(); }
@@ -48,11 +48,33 @@ async function init(){
 
 function openRoute(key){
   clearTimer();
-  const routes = {story:renderStory,practice:renderPractice,mock:renderMock,flashcards:renderFlashcards,rapid:renderRapid,progress:renderProgress,quick:renderRapid};
+  const routes = {story:renderStory,practice:renderPractice,mock:renderMock,flashcards:renderFlashcards,rapid:renderRapid,progress:renderProgress,quick:renderRapid,before:renderBeforeInterview};
   (routes[key] || renderPractice)(); wireRoutes();
   view.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function wireRoutes(){document.querySelectorAll('[data-route]').forEach(b=>{if(!b.dataset.bound){b.dataset.bound='1';b.addEventListener('click',e=>openRoute(e.currentTarget.dataset.route));}});}
+
+function renderBeforeInterview(){
+  const ids=['q01','q07','q13','q21','q49'];
+  const cards=ids.map((id,i)=>{const q=getQ(id); return q ? `<article class="before-card-item"><div class="before-num">0${i+1}</div><div><div class="eyebrow">${i===0?'OPENING':i===1?'RADIOLOGY':i===2?'SIX-YEAR INTERVAL':i===3?'WHY PSYCHIATRY':'CLOSING'}</div><h3>${esc(q.question)}</h3><div class="before-keywords">${q.keywords.map(k=>`<span>${esc(k)}</span>`).join('')}</div><div class="before-actions"><button class="mini-btn" data-before-reveal="${id}">SHOW MODEL ANSWER</button><button class="mini-btn" data-before-practice="${id}">PRACTICE</button></div><div class="before-answer" id="before-answer-${id}"><p>${esc(q.answer)}</p></div></div></article>` : ''}).join('');
+  view.innerHTML=`<div class="before-screen">
+    <div class="module-head"><div><div class="eyebrow">▶ SAVE POINT 00</div><h2>BEFORE INTERVIEW</h2><p>Your final 2–3 minute cartridge. Do this immediately before entering the interview room.</p></div><div class="story-badge">🌸 READY MODE</div></div>
+    <div class="before-hero"><div class="before-flower">✿</div><div><h3>STARGAZER CHECKPOINT</h3><p>You do not need to remember every answer. Remember your story, your reasons, and your confidence.</p></div><div class="before-timer"><span id="beforeTimer">03:00</span><button class="mini-btn" id="beforeStart">START 3-MIN TIMER</button></div></div>
+    <div class="before-grid">${cards}</div>
+    <div class="before-rules"><h3>THREE THINGS TO CARRY IN</h3><div><b>01</b><span>My path has not been linear, but it has been clarifying.</span></div><div><b>02</b><span>Radiology was valuable; it clarified that Psychiatry is the better professional fit.</span></div><div><b>03</b><span>The responsibilities that delayed my return are resolved. I am ready to commit.</span></div></div>
+    <div class="before-checklist"><label><input type="checkbox" data-before-check="calm"> I am calm enough to begin.</label><label><input type="checkbox" data-before-check="story"> I can explain my story in 60 seconds.</label><label><input type="checkbox" data-before-check="radiology"> I can explain Radiology without criticizing it.</label><label><input type="checkbox" data-before-check="ready"> I can clearly explain why I am ready now.</label></div>
+    <button class="pixel-btn primary before-enter" data-route="mock">ENTER INTERVIEW MODE ▶</button>
+  </div>`;
+  let remaining=180;
+  view.querySelector('#beforeStart')?.addEventListener('click',()=>{
+    clearTimer();
+    const btn=view.querySelector('#beforeStart'); btn.disabled=true;
+    activeTimer=setInterval(()=>{remaining--; const el=view.querySelector('#beforeTimer'); if(el) el.textContent=formatTime(Math.max(remaining,0)); if(remaining<=0){clearTimer(); if(btn) btn.textContent='TIME — YOU ARE READY';}},1000);
+  });
+  view.querySelectorAll('[data-before-reveal]').forEach(b=>b.addEventListener('click',()=>{const p=view.querySelector('#before-answer-'+b.dataset.beforeReveal); p.classList.toggle('show'); b.textContent=p.classList.contains('show')?'HIDE MODEL ANSWER':'SHOW MODEL ANSWER';}));
+  view.querySelectorAll('[data-before-practice]').forEach(b=>b.addEventListener('click',()=>{const q=getQ(b.dataset.beforePractice); if(q) startInterview([q.id],'standard');}));
+  view.querySelectorAll('[data-before-check]').forEach(b=>{b.checked=!!(state.beforeChecklist&&state.beforeChecklist[b.dataset.beforeCheck]); b.addEventListener('change',()=>{state.beforeChecklist=state.beforeChecklist||{};state.beforeChecklist[b.dataset.beforeCheck]=b.checked;saveState();});});
+}
 
 function renderStory(){
   view.innerHTML = `<div class="module-head"><div><div class="eyebrow">▶ SAVE POINT 01</div><h2>MY STORY</h2><p>Your interview narrative in four checkpoints. Think in ideas, not memorized sentences.</p></div><div class="story-badge">✿ YOUR QUEST</div></div>
@@ -407,3 +429,19 @@ function renderMock(){
 function startMock(n,mode='standard'){const qs=pickQuestions(n,mode);startInterview(qs.map(q=>q.id),mode,0);}
 
 init();
+
+/* PHASE 5 — PASS 1: installation guidance */
+(function installGuidance(){
+  const hint=document.getElementById('installHint');
+  if(!hint) return;
+  const standalone=window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if(standalone) return;
+  const isiOS=/iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  const isSafari=isiOS && /safari/i.test(navigator.userAgent) && !/crios|fxios|edgios/i.test(navigator.userAgent);
+  if(isSafari){
+    hint.hidden=false;
+    hint.innerHTML='<strong>🌸 Make Stargazer an app:</strong> tap Safari <b>Share</b> → <b>Add to Home Screen</b>. If you previously installed Stargazer, remove the old Home Screen icon first so Safari refreshes the new pixel-art icon. <button id="dismissInstall" class="mini-btn" style="margin-top:8px">GOT IT</button>';
+    document.getElementById('dismissInstall')?.addEventListener('click',()=>{hint.hidden=true; localStorage.setItem('stargazerInstallHintDismissed','1');});
+    if(localStorage.getItem('stargazerInstallHintDismissed')==='1') hint.hidden=true;
+  }
+})();
