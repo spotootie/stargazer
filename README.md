@@ -52,3 +52,6 @@ The repository now includes a real PNG `apple-touch-icon` rather than relying on
 
 ## Before Interview Save Point
 The Before Interview module is a 2–3 minute final checkpoint covering the opening, Radiology explanation, six-year interval, Why Psychiatry, and closing statement. Checklist state is stored locally in the browser.
+
+### Stargazer icon
+The app, browser favicon, PWA icon, and iOS Home Screen icon use the supplied Stargazer flower artwork (`assets/stargazer-icon.png`) with generated 180px, 192px, 512px, and favicon variants.

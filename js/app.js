@@ -445,3 +445,101 @@ init();
     if(localStorage.getItem('stargazerInstallHintDismissed')==='1') hint.hidden=true;
   }
 })();
+
+
+/* === STARGAZER RUN 3 FEEDBACK SYSTEM === */
+(function(){
+  const STORE='stargazer-feedback-v1';
+  let soundOn = false;
+  let audioCtx = null;
+
+  function reducedMotion(){ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+
+  function ensureLayers(){
+    if(!document.querySelector('.pixel-screen-flash')){
+      const f=document.createElement('div'); f.className='pixel-screen-flash'; f.setAttribute('aria-hidden','true'); document.body.appendChild(f);
+    }
+    if(!document.querySelector('.pixel-sparkles')){
+      const s=document.createElement('div'); s.className='pixel-sparkles'; s.setAttribute('aria-hidden','true'); document.body.appendChild(s);
+    }
+  }
+
+  window.stargazerToast=function(message,kind=''){
+    ensureLayers();
+    let t=document.querySelector('.pixel-toast');
+    if(!t){ t=document.createElement('div'); t.className='pixel-toast'; t.setAttribute('role','status'); document.body.appendChild(t); }
+    t.textContent=message; t.className='pixel-toast show '+kind;
+    clearTimeout(t._timer); t._timer=setTimeout(()=>t.classList.remove('show'),1500);
+  };
+
+  window.stargazerSparkle=function(target){
+    ensureLayers();
+    if(reducedMotion()) return;
+    const box=(target||document.body).getBoundingClientRect();
+    for(let i=0;i<10;i++){
+      const s=document.createElement('i'); s.className='pixel-spark';
+      s.style.left=(box.left+box.width/2+(Math.random()-.5)*Math.min(box.width,160))+'px';
+      s.style.top=(box.top+box.height/2+(Math.random()-.5)*Math.min(box.height,100))+'px';
+      s.style.setProperty('--dx',((Math.random()-.5)*120)+'px');
+      s.style.setProperty('--dy',((Math.random()-.8)*120)+'px');
+      document.querySelector('.pixel-sparkles').appendChild(s);
+      setTimeout(()=>s.remove(),800);
+    }
+  };
+
+  window.stargazerBloom=function(target){
+    if(!target) return;
+    target.classList.remove('pixel-bloom'); void target.offsetWidth; target.classList.add('pixel-bloom');
+    stargazerSparkle(target); stargazerToast('✿ SAVE POINT REACHED','star');
+  };
+
+  window.stargazerBossEntry=function(target){
+    ensureLayers();
+    if(target){target.classList.remove('pixel-boss-entry'); void target.offsetWidth; target.classList.add('pixel-boss-entry');}
+    const f=document.querySelector('.pixel-screen-flash');
+    if(f && !reducedMotion()){f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');}
+    stargazerToast('⚔ BOSS INTERVIEWER APPROACHES','boss');
+    beep(130,.11,'square');
+  };
+
+  window.stargazerReady=function(target){
+    stargazerSparkle(target||document.body);
+    stargazerToast('★ INTERVIEW READY!','star');
+    beep(660,.09,'square'); setTimeout(()=>beep(880,.1,'square'),100);
+  };
+
+  function beep(freq,duration,type){
+    if(!soundOn) return;
+    try{
+      audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type=type||'square'; o.frequency.value=freq; g.gain.value=.035;
+      o.connect(g); g.connect(audioCtx.destination); o.start();
+      g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+duration);
+      o.stop(audioCtx.currentTime+duration);
+    }catch(e){}
+  }
+
+  window.toggleStargazerSound=function(){
+    soundOn=!soundOn;
+    localStorage.setItem(STORE,JSON.stringify({soundOn}));
+    const btn=document.querySelector('.sound-toggle');
+    if(btn){btn.setAttribute('aria-pressed',String(soundOn)); btn.textContent=soundOn?'♫ SOUND ON':'♫ SOUND OFF';}
+    if(soundOn) beep(520,.08,'square');
+  };
+
+  try{soundOn=JSON.parse(localStorage.getItem(STORE)||'{}').soundOn===true}catch(e){}
+  document.addEventListener('DOMContentLoaded',()=>{
+    ensureLayers();
+    const btn=document.createElement('button');
+    btn.className='sound-toggle'; btn.type='button'; btn.setAttribute('aria-pressed',String(soundOn));
+    btn.textContent=soundOn?'♫ SOUND ON':'♫ SOUND OFF';
+    btn.addEventListener('click',toggleStargazerSound);
+    const host=document.querySelector('header')||document.body;
+    host.appendChild(btn);
+    // Gentle hooks for existing buttons/cards where recognizable.
+    document.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('click',()=>{ if(/boss|pressure/i.test(b.textContent||'')) stargazerBossEntry(b); });
+    });
+  });
+})();

@@ -3,7 +3,7 @@ const ASSETS = [
   "./", "./index.html", "./manifest.webmanifest",
   "./css/styles.css", "./js/app.js", "./data/questions.json",
   "./assets/apple-touch-icon.png", "./assets/icon-192.png", "./assets/icon-512.png",
-  "./assets/favicon.ico", "./assets/favicon-48.png", "./assets/stargazer-icon.svg"
+  "./assets/favicon.ico", "./assets/favicon-48.png", "./assets/stargazer-icon.png"
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));

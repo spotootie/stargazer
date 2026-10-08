@@ -22,7 +22,7 @@
   <main class="console-shell">
     <header class="topbar">
       <div class="brand">
-        <img src="assets/stargazer-icon.svg" alt="Pixel-art Stargazer flower" class="brand-icon" />
+        <img src="assets/stargazer-icon.png" alt="Stargazer flower pixel-art icon" class="brand-icon" />
         <div>
           <div class="brand-kicker">STARGAZER</div>
           <h1>Psychiatry Interview Trainer</h1>
@@ -85,5 +85,15 @@
       window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
     }
   </script>
+
+<section class="run3-guide" aria-label="Run 3 game feedback">
+  <div class="world-heading">✦ PIXEL FEEDBACK</div>
+  <p>Small game-like feedback keeps rehearsal motivating without distracting from your answers.</p>
+  <div class="run3-actions">
+    <button type="button" onclick="stargazerToast('✦ CHECKPOINT SAVED','star');stargazerSparkle(this)">✦ Test Save Feedback</button>
+    <button type="button" onclick="stargazerReady(this)">★ Test Interview Ready</button>
+    <button type="button" onclick="stargazerBossEntry(this)">⚔ Test Boss Entrance</button>
+  </div>
+</section>
 </body>
 </html>

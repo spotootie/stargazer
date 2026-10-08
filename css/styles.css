@@ -88,3 +88,42 @@ button { touch-action: manipulation; }
 @media(max-width:900px){.sprite-gallery{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.sprite-gallery{grid-template-columns:repeat(2,1fr)}.world-card img{width:78px;height:78px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* PASS 2 RUN 3 — restrained GBA feedback */
+.pixel-toast{position:fixed;left:50%;top:18%;transform:translate(-50%,-20px);z-index:9999;
+  padding:12px 18px;background:#FFF8F0;color:#271B3A;border:4px solid #271B3A;
+  box-shadow:6px 6px 0 #271B3A;font-family:monospace;font-weight:800;letter-spacing:.06em;
+  opacity:0;pointer-events:none;transition:opacity .18s steps(2),transform .18s steps(2)}
+.pixel-toast.show{opacity:1;transform:translate(-50%,0)}
+.pixel-toast.star{background:#FFD66B}
+.pixel-toast.boss{background:#F7E5F2;border-color:#5B285F;box-shadow:6px 6px 0 #5B285F}
+.pixel-sparkles{position:fixed;inset:0;pointer-events:none;z-index:9998;overflow:hidden}
+.pixel-spark{position:absolute;width:6px;height:6px;background:#FFD66B;box-shadow:0 0 0 2px #271B3A;
+  animation:spark-pop .7s steps(4) forwards}
+@keyframes spark-pop{0%{transform:translate(0,0) scale(1);opacity:1}
+  100%{transform:translate(var(--dx),var(--dy)) scale(.35);opacity:0}}
+.pixel-bloom{animation:flower-bloom .65s steps(5)}
+@keyframes flower-bloom{0%{transform:scale(.7) rotate(-4deg);filter:brightness(.8)}
+  60%{transform:scale(1.12) rotate(2deg);filter:brightness(1.3)}
+  100%{transform:scale(1) rotate(0);filter:brightness(1)}}
+.pixel-boss-entry{animation:boss-entry .7s steps(5)}
+@keyframes boss-entry{0%{opacity:0;transform:translateY(14px);filter:brightness(1.8)}
+  55%{opacity:1;transform:translateY(-3px);filter:brightness(1.3)}
+  100%{opacity:1;transform:translateY(0);filter:brightness(1)}}
+.pixel-screen-flash{position:fixed;inset:0;background:#FFD66B;opacity:0;pointer-events:none;z-index:10000}
+.pixel-screen-flash.go{animation:screen-flash .3s steps(3)}
+@keyframes screen-flash{0%{opacity:0}25%{opacity:.35}55%{opacity:.12}100%{opacity:0}}
+.pixel-cursor{display:inline-block;width:.6em;height:1em;background:#E84F91;vertical-align:-.12em;animation:cursor-blink .8s steps(2) infinite}
+@keyframes cursor-blink{50%{opacity:0}}
+.sound-toggle{font-family:monospace;border:3px solid #271B3A;background:#FFF8F0;color:#271B3A;
+  padding:7px 10px;box-shadow:3px 3px 0 #271B3A;cursor:pointer}
+.sound-toggle[aria-pressed="true"]{background:#FFD66B}
+@media(prefers-reduced-motion:reduce){
+ .pixel-toast,.pixel-spark,.pixel-bloom,.pixel-boss-entry,.pixel-screen-flash,.pixel-cursor{animation:none!important;transition:none!important}
+ .pixel-toast.show{transform:translate(-50%,0)}
+}
+
+.run3-guide{margin:24px 0;padding:16px;background:#FFF8F0;border:4px solid #271B3A;box-shadow:6px 6px 0 #271B3A}
+.run3-actions{display:flex;gap:10px;flex-wrap:wrap}
+.run3-actions button{font-family:monospace;font-weight:700;border:3px solid #271B3A;background:#FFD66B;color:#271B3A;padding:9px 12px;box-shadow:3px 3px 0 #271B3A;cursor:pointer}
+.run3-actions button:focus-visible,.sound-toggle:focus-visible{outline:3px dashed #E84F91;outline-offset:3px}
