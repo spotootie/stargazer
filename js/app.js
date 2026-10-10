@@ -48,11 +48,52 @@ async function init(){
 
 function openRoute(key){
   clearTimer();
-  const routes = {story:renderStory,practice:renderPractice,mock:renderMock,flashcards:renderFlashcards,rapid:renderRapid,progress:renderProgress,quick:renderRapid,before:renderBeforeInterview};
+  const routes = {story:renderStory,practice:renderPractice,mock:renderMock,flashcards:renderFlashcards,rapid:renderRapid,progress:renderProgress,quick:renderRapid,before:renderBeforeInterview,study:renderStudySheet};
   (routes[key] || renderPractice)(); wireRoutes();
   view.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function wireRoutes(){document.querySelectorAll('[data-route]').forEach(b=>{if(!b.dataset.bound){b.dataset.bound='1';b.addEventListener('click',e=>openRoute(e.currentTarget.dataset.route));}});}
+
+
+function renderStudySheet(){
+  const categories=[{id:'all',name:'ALL TOPICS'},...db.categories.map(c=>({id:c.id,name:c.name.toUpperCase()}))];
+  view.innerHTML=`<section class="study-screen">
+    <div class="module-head"><div><div class="eyebrow">▶ FIELD GUIDE / CONTINUOUS SCROLL</div><h2>HIGH-YIELD STUDY SHEET</h2><p>One page to read from top to bottom. Use the answers as models, not scripts: keep the meaning, then speak naturally in your own words.</p></div><div class="story-badge">📖 ${db.questions.length} QUESTIONS</div></div>
+    <div class="study-tools">
+      <label class="study-search">⌕ <input id="studySearch" type="search" placeholder="Search questions, answers, keywords…" aria-label="Search study sheet"></label>
+      <label class="study-select">TOPIC <select id="studyCategory">${categories.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}</select></label>
+      <label class="study-check"><input type="checkbox" id="studyHighYield"> HIGH-YIELD ONLY</label>
+      <label class="study-check"><input type="checkbox" id="studyHideAnswers"> HIDE ANSWERS</label>
+      <button class="mini-btn" id="studyExpand">SHOW ALL ANSWERS</button>
+    </div>
+    <div class="study-jumps" id="studyJumps"></div>
+    <div class="study-progress"><span id="studyVisibleCount">${db.questions.length} QUESTIONS</span><span>Tip: read the question, pause, answer aloud, then compare.</span></div>
+    <div id="studyList" class="study-list"></div>
+  </section>`;
+  const search=view.querySelector('#studySearch'), category=view.querySelector('#studyCategory'), high=view.querySelector('#studyHighYield'), hide=view.querySelector('#studyHideAnswers'), list=view.querySelector('#studyList'), jumps=view.querySelector('#studyJumps'), count=view.querySelector('#studyVisibleCount');
+  let allOpen=false;
+  function render(){
+    const term=search.value.trim().toLowerCase();
+    const filtered=db.questions.filter(q=>{
+      const text=[q.question,q.answer,...(q.keywords||[]),cat(q.category).name].join(' ').toLowerCase();
+      return (!term||text.includes(term))&&(category.value==='all'||q.category===category.value)&&(!high.checked||q.highYield||['q01','q02','q03','q07','q13','q21','q49','q50','q51','q52'].includes(q.id));
+    });
+    count.textContent=`${filtered.length} OF ${db.questions.length} QUESTIONS`;
+    const seen=new Set(); jumps.innerHTML=filtered.map(q=>{if(seen.has(q.category))return '';seen.add(q.category);return `<a href="#study-${q.id}">${esc(cat(q.category).icon)} ${esc(cat(q.category).name)}</a>`}).join('');
+    list.innerHTML=filtered.map((q,i)=>`<article class="study-item ${q.highYield?'is-high-yield':''}" id="study-${q.id}">
+      <div class="study-item-top"><span class="study-number">${String(i+1).padStart(2,'0')}</span><span class="study-category">${esc(cat(q.category).name)}</span>${(q.highYield||['q01','q02','q03','q07','q13','q21','q49','q50','q51','q52'].includes(q.id))?'<span class="study-star">✦ HIGH-YIELD</span>':''}</div>
+      <h3>${esc(q.question)}</h3><div class="study-keywords">${(q.keywords||[]).map(k=>`<span>${esc(k)}</span>`).join('')}</div>
+      <div class="study-answer ${hide.checked?'answer-hidden':''} ${allOpen?'answer-open':''}" ${hide.checked?'hidden':''}><p>${esc(q.answer)}</p></div>
+      <div class="study-actions"><button class="mini-btn" data-study-reveal="${q.id}">${allOpen?'HIDE ANSWER':'REVEAL MODEL ANSWER'}</button><button class="mini-btn" data-study-practice="${q.id}">PRACTICE THIS</button><button class="mini-btn" data-study-copy="${q.id}">COPY ANSWER</button></div>
+    </article>`).join('')||'<div class="empty-state">No questions match those filters. Try another topic or search term.</div>';
+    list.querySelectorAll('[data-study-reveal]').forEach(b=>b.addEventListener('click',()=>{const ans=b.closest('.study-item').querySelector('.study-answer');ans.hidden=!ans.hidden;b.textContent=ans.hidden?'REVEAL MODEL ANSWER':'HIDE ANSWER';}));
+    list.querySelectorAll('[data-study-practice]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.studyPractice;openRoute('practice');setTimeout(()=>{const card=view.querySelector(`[data-practice-id="${id}"]`);if(card)card.scrollIntoView({behavior:'smooth',block:'center'});else startInterview([id],'study');},80);}));
+    list.querySelectorAll('[data-study-copy]').forEach(b=>b.addEventListener('click',async()=>{const q=getQ(b.dataset.studyCopy);try{await navigator.clipboard.writeText(q.answer);b.textContent='COPIED!';setTimeout(()=>b.textContent='COPY ANSWER',1200)}catch{b.textContent='COPY NOT AVAILABLE';}}));
+  }
+  [search,category,high,hide].forEach(el=>el.addEventListener('input',render));
+  view.querySelector('#studyExpand').addEventListener('click',()=>{allOpen=!allOpen;hide.checked=false;render();view.querySelector('#studyExpand').textContent=allOpen?'COLLAPSE ANSWERS':'SHOW ALL ANSWERS';});
+  render();
+}
 
 function renderBeforeInterview(){
   const ids=['q01','q07','q13','q21','q49'];
